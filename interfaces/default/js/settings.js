@@ -3,7 +3,7 @@ $(document).ready(function () {
 
     // Only look for tvs if its enabled.
     if ($("#samsungtv_enable").is(':checked')) {
-        samsung_tvs();
+        //samsung_tvs();
     }
     $('#other button.save').on('click', function (event) {
         event.preventDefault();
