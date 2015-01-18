@@ -13,12 +13,26 @@ import re
 import itertools
 import operator
 from operator import itemgetter
+from sqlobject import SQLObject, SQLObjectNotFound
+from sqlobject.col import StringCol, IntCol
+from cherrypy.lib.auth2 import require
 #from uuid import getnode as get_mac
+
+class Samsungtvs(SQLObject):
+    """ SQLObject class for kodi_tvs table """
+    name = StringCol(default=None)
+    model = StringCol(default=None)
+    # Need to be unique as udp sucks
+    host = StringCol(default=None, unique=True)
+    mac = StringCol(default=None)
+    htpchost = StringCol(default=None)
 
 
 class Samsungtv:
     def __init__(self):
         self.logger = logging.getLogger('modules.samsungtv')
+        Samsungtvs.createTable(ifNotExists=True)
+        self.mac = 'E8:E0:B7:D3:A4:62'
         htpc.MODULES.append({
             'name': 'Samsung Remote',
             'id': 'samsungtv',
@@ -27,34 +41,45 @@ class Samsungtv:
                 {'type': 'text', 'label': 'Menu name', 'name': 'samsungtv_name'},
                 {'type': 'select',
                  'label': 'TVs',
-                 'name': 'tvs',
+                 'name': 'samsung_tv_id',
                  'options': [
-                    {'name': 'Select', 'value': 0}
-                ]},
+                        {'name': 'Select', 'value': 0}
+                    ],
+                'fbutton': [htpc.WEBDIR + 'samsungtv/findtv2', 'Search for tvs', 'Discover']
+                },
+                {'type': 'text', 'label': 'Tv Name', 'name': 'samsungtv_name2', 'placeholder': 'Living Room'},
                 {'type': 'text', 'label': 'IP / Host *', 'name': 'samsungtv_host'},
                 {'type': 'text', 'label': 'Tv Model', 'name': 'samsungtv_model'},
                 {'type': 'text', 'label': 'HTPC-Manager MAC', 'name': 'samsung_htpcmac'},
                 {'type': 'text', 'label': 'HTPC-Manager IP', 'name': 'samsung_htpchost'}
 
-        ]})
+            ]
+        })
+
+        tv = htpc.settings.get('samsung_current_tv', 0)
+        self.changetv(tv)
 
     @cherrypy.expose()
+    @require()
     def index(self):
         return htpc.LOOKUP.get_template('samsungtv.html').render(scriptname='samsungtv')
 
     @cherrypy.expose()
+    @require()
     def sendkey(self, action):
         try:
             key = action
             if key == 'undefined':
                 return
             else:
-                src = htpc.settings.get('samsung_htpchost', '')
-                mac = htpc.settings.get('samsung_htpcmac', '')
+
+                src = self.current.htpchost
+                mac = self.current.mac
                 remote = 'HTPC-Manager remote'
-                dst = htpc.settings.get('samsungtv_host', '')
+                dst = self.current.host
                 application = 'python'
-                tv  = htpc.settings.get('samsungtv_model', '')
+                tv = self.current.model
+
 
                 new = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 new.connect((dst, 55000))
@@ -84,8 +109,94 @@ class Samsungtv:
             return ''
 
     @cherrypy.expose()
+    @require()
     @cherrypy.tools.json_out()
-    def findtv(self, id=None):
+    def settv(self, samsungtv_id, samsungtv_name2, samsungtv_host, samsungtv_model, samsungtv_htpcmac):
+        """ Create a server if id=0, else update a server """
+        if samsungtv_id == "0":
+            self.logger.debug("Creating samsungtv in database")
+            try:
+                tv = Samsungtvs(name=samsungtv_name2,
+                                host=samsungtv_host,
+                                model=samsungtv_model,
+                                htpchost=samsungtv_host,
+                                mac=samsungtv_htpcmac)
+                self.changetv(tv.id)
+                return 1
+            except Exception, e:
+                self.logger.debug("Exception: " + str(e))
+                self.logger.error("Unable to create kodi-Server in database")
+                return 0
+        else:
+            self.logger.debug("Updating tv " + samsungtv_name2 + " in database")
+            try:
+                tv = Samsungtvs.selectBy(id=samsungtv_id).getOne()
+                tv.name = samsungtv_name2
+                tv.host = samsungtv_host
+                tv.mac = samsungtv_htpcmac
+                tv.htpchost = samsungtv_host
+                return 1
+            except SQLObjectNotFound, e:
+                self.logger.error("Unable to update Samsung tv " + tv.name + " in database")
+                return 0
+
+    @cherrypy.expose()
+    @require()
+    def deltv(self, id):
+        """ Delete a server """
+        self.logger.debug("Deleting server " + str(id))
+        Samsungtvs.delete(id)
+        self.changetv()
+        return
+
+    @cherrypy.expose()
+    @require()
+    @cherrypy.tools.json_out()
+    def changetv(self, id=0):
+        try:
+            self.current = Samsungtvs.selectBy(id=id).getOne()
+            htpc.settings.set('samsung_current_tv', str(id))
+            self.logger.info("Selecting Samsung tv: %s", id)
+            return "success"
+        except SQLObjectNotFound:
+            try:
+                self.current = Samsungtvs.select(limit=1).getOne()
+                self.logger.error("Invalid server. Selecting first Available.")
+                return "success"
+            except SQLObjectNotFound:
+                self.current = None
+                self.logger.warning("No configured Samsungtvs.")
+                return "No valid servers"
+
+    @cherrypy.expose()
+    @require()
+    @cherrypy.tools.json_out()
+    def gettvs(self, id=None):
+        if id:
+            """ Get samsungtvs info """
+            try:
+                tv = Samsungtvs.selectBy(id=id).getOne()
+                return dict((c, getattr(tv, c)) for c in tv.sqlmeta.columns)
+            except SQLObjectNotFound:
+                return
+
+        """ Get a list of all tvs and the current tv """
+        tvs = []
+        for s in Samsungtvs.select():
+            tvs.append({'id': s.id, 'name': s.name})
+        if len(tvs) < 1:
+            return
+        try:
+            current = self.current.name
+        except AttributeError:
+            current = None
+        return {'current': current, 'tvs': tvs}
+
+    @cherrypy.expose()
+    @cherrypy.tools.json_out()
+    @require()
+    def findtv2(self, id=None):
+        print "findtv2"
         result_list = []
         r = []
         sr = 0
@@ -94,8 +205,6 @@ class Samsungtv:
         ip = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         ip.connect(('8.8.8.8', 80))
         local_ip = ip.getsockname()[0]
-
-        iid = 0
 
         # Tries to find the mac, this is likly to be the wrong one.. my tv accepts anything
         #mac = ':'.join(("%012X" % get_mac())[i:i+2] for i in range(0, 12, 2))
@@ -120,24 +229,16 @@ class Samsungtv:
                         d = {}
                         xml = xmltodict.parse(desc)
                         if 'tv' in xml["root"]["device"]["friendlyName"].lower():
-                            iid += 1
                             d["name"] = xml["root"]["device"]["friendlyName"]
                             d["host"] = host
-                            d["id"] = iid
-                            d["tv_model"] = xml["root"]["device"]["modelName"]
-                            d["local_ip"] = local_ip
+                            #d["id"] = iid
+                            d["model"] = xml["root"]["device"]["modelName"]
+                            d["htpchost"] = local_ip
                             d["mac"] = mac
                             result_list.append(d)
 
                     except Exception as e:
-                        pass#
-        if id:
-            for tt in result_list:
-                if tt["id"] == int(id):
-                    return tt
-
-        if len(result_list) == 1:
-            return result_list
+                        pass
 
         # Remove dupe dicts from list
         getvals = operator.itemgetter('host')
@@ -145,6 +246,12 @@ class Samsungtv:
         result = []
         for k, g in itertools.groupby(result_list, getvals):
             result.append(g.next())
-        result_list[:] = result
 
-        return result_list
+        for something in result:
+            try:
+                Samsungtvs(**something)
+            except Exception as e:
+                # Dont stop on dupe errors
+                continue
+
+        return result

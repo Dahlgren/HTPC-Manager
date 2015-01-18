@@ -98,6 +98,10 @@ $(document).ready(function () {
                 users_update_user(0);
                 this.reset();
             }
+            if ($('#samsungtv_name').is(":visible")) {
+                samsung_tvs(0);
+                this.reset();
+            }
             if ($('#plex_name').is(":visible")) {
                 $.post(WEBDIR + 'plex/myPlexSignin', '', function (data) {
                     if (data === null) return;
@@ -150,6 +154,35 @@ $(document).ready(function () {
     });
     kodi_update_servers(0);
 
+    // samsung tv
+    $('input.enable-module').trigger('change');
+    $('#samsung_tv_id').change(function () {
+        $('button:reset:visible').html('Clear').removeClass('btn-danger').unbind();
+        var item = $(this);
+        var id = item.val();
+        if (id === 0) $('button:reset:visible').trigger('click');
+        $.get(WEBDIR + 'kodi/getserver?id=' + id, function (data) {
+            if (data === null) return;
+            $('#samsungtv_name').val(data.name); // Menu name
+            $('#samsungtv_name2').val(data.name); // Like Living Room
+            $('#samsungtv_host').val(data.host);
+            $('#samsungtv_model').val(data.model);
+            $('#samsung_htpcmac').val(data.mac);
+            $('#samsung_htpchost').val(data.htpchost);
+            $("button:reset:visible").html('Delete').addClass('btn-danger').click(function (e) {
+                var name = item.find('option:selected').text();
+                if (!confirm('Delete ' + name)) return;
+                $.get(WEBDIR + 'samsungtv/deltv?id=' + id, function (data) {
+                    notify('Settings', 'TV deleted ' + name, 'info');
+                    $(this).val(0);
+                    item.find('option[value=' + id + ']').remove();
+                    $('button:reset:visible').html('Clear').removeClass('btn-danger').unbind();
+                });
+            });
+        });
+    });
+    samsung_tvs(0);
+
     $('input.enable-module').trigger('change');
     $('#users_user_id').change(function () {
         $('button:reset:visible').html('Clear').removeClass('btn-danger').unbind();
@@ -189,17 +222,18 @@ $(document).ready(function () {
     gdm_plex_servers(0);
 
     $('input.enable-module').trigger('change');
-        $('#tvs').change(function () {
+        $('#samsung_tv_id').change(function () {
         var item = $(this);
         var id = item.val();
-        $.get(WEBDIR + 'samsungtv/findtv?id=' + id, function (data) {
+        $.get(WEBDIR + 'samsungtv/gettvs?id=' + id, function (data) {
             console.log(data)
             if (data === null) return;
-            $('#samsungtv_name').val(data.tv_model);
+            $('#samsungtv_name').val(data.name); // Menu name
+            $('#samsungtv_name2').val(data.name); // Like Living Room
             $('#samsungtv_host').val(data.host);
-            $('#samsungtv_model').val(data.tv_model);
+            $('#samsungtv_model').val(data.model);
             $('#samsung_htpcmac').val(data.mac);
-            $('#samsung_htpchost').val(data.local_ip);
+            $('#samsung_htpchost').val(data.htpchost);
         });
     });
 
@@ -240,6 +274,8 @@ function users_update_user(id) {
         });
     }, 'json');
 }
+
+//
 
 function get_branches() {
     $.get(WEBDIR + 'update/branches', function (data) {
@@ -283,11 +319,12 @@ $(document).on('click', '.force_update', function(e){
     notify("Updating", "Forced update started", "info");
 });
 
+
 function samsung_tvs(id) {
-    $.get(WEBDIR + 'samsungtv/findtv', function (data) {
+    $.get(WEBDIR + 'samsungtv/gettvs', function (data) {
         if (data === null) return;
-        var tv = $('#tvs').empty().append($('<option>').text('Select').val(0));
-        $.each(data, function (i, item) {
+        var tv = $('#samsung_tv_id').empty().append($('<option>').text('Select').val(0));
+        $.each(data.tvs, function (i, item) {
             var option = $('<option>').text(item.name).val(item.id);
             if (id == item.id) option.attr('selected', 'selected');
             tv.append(option);
