@@ -102,7 +102,8 @@ def update_needed():
     up = Updater()
     # Returns True or False
     check = up.update_needed()
-    if check:
+    # check if restart is ok
+    if not check:
         Thread(target=up.updateEngine.update).start()
     else:
         print "update is not needed"
@@ -115,7 +116,7 @@ def init_sched():
     if htpc.settings.get('autoupdate', True):
         print "auto update is in db"
         SCHED = BackgroundScheduler()
-        SCHED.add_job(update_needed, trigger=IntervalTrigger(seconds=30))
+        SCHED.add_job(update_needed, trigger=IntervalTrigger(seconds=60))
         SCHED.start()
 
 
