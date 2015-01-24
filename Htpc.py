@@ -103,8 +103,7 @@ def update_needed():
     # Returns True or False
     check = up.update_needed()
     if check:
-        print "update is needed"
-        #Thread(target=up.updateEngine.update).start()
+        Thread(target=up.updateEngine.update).start()
     else:
         print "update is not needed"
 
@@ -114,7 +113,7 @@ def init_sched():
     from apscheduler.triggers.interval import IntervalTrigger
 
     if htpc.settings.get('autoupdate', True):
-        print "autoupdate is True"
+        print "auto update is in db"
         SCHED = BackgroundScheduler()
         SCHED.add_job(update_needed, trigger=IntervalTrigger(seconds=30))
         SCHED.start()
