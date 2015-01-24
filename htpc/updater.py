@@ -180,6 +180,15 @@ class Updater:
     def branches(self):
         return self.updateEngine.branches()
 
+    def update_needed(self):
+        print "update needed"
+        r = self.check_update()
+        if r["updateNeeded"]:
+            return True
+        else:
+            return False
+
+
 
 class GitUpdater():
     """ Class to update HTPC Manager using git commands. """

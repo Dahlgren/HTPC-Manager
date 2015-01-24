@@ -97,6 +97,29 @@ def load_modules():
     htpc.ROOT.vnstat = Vnstat()
 
 
+def update_needed():
+    from htpc.updater import Updater
+    up = Updater()
+    # Returns True or False
+    check = up.update_needed()
+    if check:
+        print "update is needed"
+        #Thread(target=up.updateEngine.update).start()
+    else:
+        print "update is not needed"
+
+
+def init_sched():
+    from apscheduler.schedulers.background import BackgroundScheduler
+    from apscheduler.triggers.interval import IntervalTrigger
+
+    if htpc.settings.get('autoupdate', True):
+        print "autoupdate is True"
+        SCHED = BackgroundScheduler()
+        SCHED.add_job(update_needed, trigger=IntervalTrigger(seconds=30))
+        SCHED.start()
+
+
 def main():
     """
     Main function is called at startup.
@@ -147,6 +170,8 @@ def main():
 
     # Inititialize root and settings page
     load_modules()
+
+    init_sched()
 
     htpc.TEMPLATE = os.path.join(htpc.RUNDIR, 'interfaces/',
                                  htpc.settings.get('app_template', 'default'))
