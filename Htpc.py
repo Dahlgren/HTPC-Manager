@@ -10,6 +10,7 @@ import os
 import sys
 import htpc
 import webbrowser
+from threading import Thread
 
 
 def parse_arguments():
