@@ -12,19 +12,6 @@ from htpc.manageusers import Manageusers
 from cherrypy.process.plugins import Daemonizer, PIDFile
 from helpers import create_https_certificates
 from root import do_restart
-#from apscheduler.schedulers.background import BackgroundScheduler
-#from apscheduler.triggers.interval import IntervalTrigger
-from datetime import datetime
-
-
-#def tick():
-#    print 'Tick! The time is: %s' % datetime.now()
-
-#SCHED = BackgroundScheduler()
-#updater.dbUpdate, trigger=IntervalTrigger(
-#                hours=CONFIG.UPDATE_DB_INTERVA
-#SCHED.add_job(tick, trigger=IntervalTrigger(seconds=3))
-#SCHED.start()
 
 
 def secureheaders():
@@ -115,7 +102,6 @@ def start():
         })
 
     if htpc.settings.get('app_use_proxy_headers'):
-        print "Enabling proxy heaers"
         cherrypy.config.update({
                 'tools.proxy.on': True
 

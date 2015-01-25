@@ -130,7 +130,7 @@ ${self.body()}
         </div>
     </div>
 
-% elif s.get('check_for_updates') and htpc.CURRENT_VERSION != htpc.LATEST_HASH and htpc.COMMITS_BEHIND > 0:
+% elif s.get('check_for_updates') and htpc.CURRENT_HASH != htpc.LATEST_HASH and htpc.COMMITS_BEHIND > 0:
     <div class="footer2">
         <div class="navbar navbar-fixed-bottom">
             <div class="container">
