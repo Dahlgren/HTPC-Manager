@@ -110,6 +110,11 @@ class Updater:
 
     @cherrypy.expose()
     @cherrypy.tools.json_out()
+    def updatenow(self):
+        Thread(target=self.updateEngine.update).start()
+
+    @cherrypy.expose()
+    @cherrypy.tools.json_out()
     def status(self):
         """ method to determine if HTPC Manager is currently updating """
         return self.updateEngine.UPDATING
@@ -131,7 +136,9 @@ class Updater:
 
         # Get current and latest version
         current = self.updateEngine.current()
+        htpc.CURRENT_HASH = current
         latest = self.updateEngine.latest()
+        htpc.LASTEST_HASH = latest
 
         if not latest:
             self.logger.error("Failed to determine the latest version for HTPC Manager.")
@@ -156,6 +163,7 @@ class Updater:
             output['updateNeeded'] = False
         else:
             behind = self.behind_by(current, latest)
+            htpc.COMMITS_BEHIND = behind
             output['versionsBehind'] = behind
 
         self.logger.info("Currently " + str(output['versionsBehind']) + " commits behind.")

@@ -99,13 +99,13 @@ def load_modules():
 
 
 def update_needed():
-    from htpc.updater import Updater
-    up = Updater()
-    # Returns True or False
-    check = up.update_needed()
-    # check if restart is ok
-    if not check:
-        Thread(target=up.updateEngine.update).start()
+    update_avail = htpc.ROOT.update.update_needed()
+    # returns true or false
+    if update_avail:
+        htpc.UPDATE_AVAIL = True
+        if htpc.settings.get("auto_update", True):
+            Thread(target=htpc.ROOT.update.updateEngine.update).start()
+
     else:
         print "update is not needed"
 
@@ -114,11 +114,11 @@ def init_sched():
     from apscheduler.schedulers.background import BackgroundScheduler
     from apscheduler.triggers.interval import IntervalTrigger
 
-    if htpc.settings.get('autoupdate', True):
-        print "auto update is in db"
-        SCHED = BackgroundScheduler()
-        SCHED.add_job(update_needed, trigger=IntervalTrigger(seconds=60))
-        SCHED.start()
+    if htpc.settings.get('check_for_update', True):
+        print "check for update"
+        htpc.SCHED = BackgroundScheduler()
+        htpc.SCHED.add_job(update_needed, trigger=IntervalTrigger(seconds=600))
+        htpc.SCHED.start()
 
 
 def main():

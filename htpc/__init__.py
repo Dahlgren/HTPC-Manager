@@ -24,3 +24,7 @@ LOGGER = None
 LOGLEVEL = None
 settings = None
 ENABLESSL = False
+UPDATE_AVAIL = True
+COMMITS_BEHIND = None
+CURRENT_HASH = None
+LATEST_HASH = None
