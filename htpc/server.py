@@ -190,4 +190,5 @@ def start():
     print '*******************************************************************'
     print 'Silly test 1'
     print 'Silly test 2'
+    print 't5'
     cherrypy.quickstart(htpc.ROOT, htpc.WEBDIR[:-1], config=app_config)
