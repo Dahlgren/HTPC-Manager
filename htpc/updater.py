@@ -42,7 +42,7 @@ class Updater:
         # Set update engine. Use git updater or update from source.
         self.updateEngine = self.getEngine()
         # Check for updates automatically
-        htpc.SCHED.add_job(self.update_needed, trigger=IntervalTrigger(hours=6))
+        htpc.SCHED.add_job(self.update_needed, trigger=IntervalTrigger(minutes=5))
 
     """ Determine the update method """
     def getEngine(self):
