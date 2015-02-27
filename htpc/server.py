@@ -189,4 +189,5 @@ def start():
     print 'Start your browser and go to http%s://localhost:%s%s' % (protocol, htpc.PORT, htpc.WEBDIR[:-1])
     print '*******************************************************************'
     print 'Silly test 1'
+    print 'Silly test 2'
     cherrypy.quickstart(htpc.ROOT, htpc.WEBDIR[:-1], config=app_config)

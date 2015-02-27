@@ -42,7 +42,7 @@ class Updater:
         # Set update engine. Use git updater or update from source.
         self.updateEngine = self.getEngine()
         # Check for updates automatically
-        htpc.SCHED.add_job(self.update_needed, trigger=IntervalTrigger(minutes=5))
+        htpc.SCHED.add_job(self.update_needed, trigger=IntervalTrigger(minutes=2))
 
     """ Determine the update method """
     def getEngine(self):
@@ -136,23 +136,25 @@ class Updater:
         self.logger.info("Checking for updates from %s." % self.updateEngineName)
 
         # Get current and latest version
+        # current can return True, False, Unknown, and SHA
         current = self.updateEngine.current()
         htpc.CURRENT_HASH = current
+        # Can return True, False
         latest = self.updateEngine.latest()
         htpc.LATEST_HASH = latest
 
-        if not latest:
+        if latest is False:
             self.logger.error("Failed to determine the latest version for HTPC Manager.")
         else:
             output['latestVersion'] = latest
 
-        if not current:
+        if current is False:
             self.logger.error("Failed to determine the current version for HTPC Manager.")
         else:
             output['currentVersion'] = current
 
         # If current or latest failed, updating is not possible
-        if not current or not latest:
+        if current is False or latest is False:
             self.logger.debug("Cancel update.")
             output['updateNeeded'] = False
             return output
