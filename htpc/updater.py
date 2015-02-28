@@ -43,6 +43,9 @@ class Updater:
         self.updateEngine = self.getEngine()
         # Check for updates automatically
         htpc.SCHED.add_job(self.update_needed, trigger=IntervalTrigger(minutes=2))
+        
+        self.logger.info(htpc.SCHED)
+        htpc.SCHED.start()
 
     """ Determine the update method """
     def getEngine(self):
@@ -191,7 +194,8 @@ class Updater:
     @cherrypy.tools.json_out()
     def branches(self):
         return self.updateEngine.branches()
-
+    
+    @cherrypy.expose()
     def update_needed(self):
         self.logger.info("Running update_needed")
         update_avail = self.check_update()
