@@ -15,6 +15,7 @@ from cherrypy.lib.auth2 import *
 import subprocess
 
 
+
 def do_restart():
     arguments = sys.argv[:]
     arguments.insert(0, sys.executable)
