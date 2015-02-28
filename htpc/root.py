@@ -12,6 +12,7 @@ import htpc
 import logging
 from threading import Thread
 from cherrypy.lib.auth2 import *
+import subprocess
 
 
 def do_restart():
@@ -22,7 +23,9 @@ def do_restart():
     os.chdir(os.getcwd())
     cherrypy.engine.exit()
     htpc.SCHED.shutdown(wait=False)
-    os.execv(sys.executable, arguments)
+    subprocess.popen(arguments, cwd=os.getcwd())
+    os._exit(0)
+    #os.execv(sys.executable, arguments)
 
 
 class RestrictedArea:
