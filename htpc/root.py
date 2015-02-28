@@ -21,8 +21,8 @@ def do_restart():
     arguments.insert(0, sys.executable)
     if sys.platform == 'win32':
         arguments = ['"%s"' % arg for arg in arguments]
-    os.chdir(os.getcwd())
-    cherrypy.engine.exit()
+    #os.chdir(os.getcwd())
+    #cherrypy.engine.exit()
     #htpc.SCHED.shutdown(wait=False)
     subprocess.popen(arguments, cwd=os.getcwd())
     os._exit(0)
