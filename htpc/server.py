@@ -123,6 +123,12 @@ def start():
     # Create PID if specified
     if htpc.PID:
         PIDFile(cherrypy.engine, htpc.PID).subscribe()
+    
+    def stopp_ap():
+        htpc.SCHED.shutdown(wait=False)
+    
+    stopp_ap.priority = 10
+    cherrypy.engine.subscribe('stop', stopp_ap)
 
     # Set static directories
     webdir = os.path.join(htpc.RUNDIR, htpc.TEMPLATE)
