@@ -19,7 +19,7 @@ def do_restart():
     arguments = sys.argv[:]
     cmd = [sys.executable, os.path.join(htpc.RUNDIR, 'Htpc.py')]
     cmd += arguments[1:]
-    subprocess.Popen(cmd, cwd=os.getcwd())
+    subprocess.Popen(cmd, cwd=os.getcwd(), shell=True)
     # Kill the app
     os._exit(0)
 
