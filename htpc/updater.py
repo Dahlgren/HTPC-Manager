@@ -200,7 +200,7 @@ class Updater:
     def update_needed(self):
         self.logger.info("Running update_needed")
         update_avail = self.check_update()
-        self.logger(update_avail)
+        self.logger.info(update_avail)
         # returns true or false
         if update_avail.get("updateNeeded"):
             if htpc.settings.get('app_check_for_updates', False):
