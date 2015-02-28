@@ -64,7 +64,7 @@ class Root(object):
         """ Shutdown CherryPy and exit script """
         self.logger.info("Shutting down htpc-manager.")
         cherrypy.engine.exit()
-        htpc.SCHED.shutdown(wait=False)
+        #htpc.SCHED.shutdown(wait=False)
         return "HTPC Manager has shut down"
 
     @cherrypy.expose(alias='robots.txt')

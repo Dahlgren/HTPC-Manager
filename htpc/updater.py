@@ -271,6 +271,7 @@ class GitUpdater():
             "branches": []
         }
 
+
         if self.current is not False:
             d["verified"] = True
         else:
