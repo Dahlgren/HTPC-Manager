@@ -15,6 +15,7 @@ from cherrypy.lib.auth2 import *
 import subprocess
 
 
+
 def do_restart():
     arguments = sys.argv[:]
     cmd = [sys.executable, os.path.join(htpc.RUNDIR, 'Htpc.py')]
