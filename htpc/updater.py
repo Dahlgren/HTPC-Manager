@@ -45,7 +45,7 @@ class Updater:
         htpc.SCHED.add_job(self.update_needed, trigger=IntervalTrigger(minutes=2))
         
         self.logger.info(htpc.SCHED)
-        htpc.SCHED.start()
+        #htpc.SCHED.start()
 
     """ Determine the update method """
     def getEngine(self):
@@ -174,6 +174,7 @@ class Updater:
             output['versionsBehind'] = behind
 
         self.logger.info("Currently " + str(output['versionsBehind']) + " commits behind.")
+        self.logger.info(output)
         return output
 
     def behind_by(self, current, latest):
