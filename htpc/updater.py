@@ -43,7 +43,7 @@ class Updater:
         self.updateEngine = self.getEngine()
         # Check for updates automatically
         htpc.SCHED.add_job(self.update_needed, trigger=IntervalTrigger(minutes=2))
-        
+
         self.logger.info(htpc.SCHED)
         #htpc.SCHED.start()
 
@@ -195,14 +195,16 @@ class Updater:
     @cherrypy.tools.json_out()
     def branches(self):
         return self.updateEngine.branches()
-    
+
     @cherrypy.expose()
     def update_needed(self):
         self.logger.info("Running update_needed")
         update_avail = self.check_update()
         self.logger.info(update_avail)
         # returns true or false
-        if update_avail.get("updateNeeded"):
+        # force update every 2 minutes
+        if True is True:
+        #if update_avail.get("updateNeeded"):
             if htpc.settings.get('app_check_for_updates', False):
                 self.logger.debug("Add update footer")
                 # Used for the notification footer
