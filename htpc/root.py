@@ -22,7 +22,7 @@ def do_restart():
         arguments = ['"%s"' % arg for arg in arguments]
     os.chdir(os.getcwd())
     cherrypy.engine.exit()
-    htpc.SCHED.shutdown(wait=False)
+    #htpc.SCHED.shutdown(wait=False)
     subprocess.popen(arguments, cwd=os.getcwd())
     os._exit(0)
     #os.execv(sys.executable, arguments)
