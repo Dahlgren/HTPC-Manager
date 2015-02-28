@@ -15,17 +15,13 @@ from cherrypy.lib.auth2 import *
 import subprocess
 
 
-
 def do_restart():
     arguments = sys.argv[:]
-    arguments.insert(0, sys.executable)
-    if sys.platform == 'win32':
-        arguments = ['"%s"' % arg for arg in arguments]
+    cmd = [sys.executable, os.path.join(htpc.RUNDIR, 'Htpc.py')]
+    cmd += arguments[1:]
     #os.chdir(os.getcwd())
     #cherrypy.engine.exit()
     #htpc.SCHED.shutdown(wait=False)
-    print arguments
-    print os.getcwd()
     subprocess.Popen(arguments, cwd=os.getcwd())
     os._exit(0)
     #os.execv(sys.executable, arguments)
