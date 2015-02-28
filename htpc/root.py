@@ -19,12 +19,9 @@ def do_restart():
     arguments = sys.argv[:]
     cmd = [sys.executable, os.path.join(htpc.RUNDIR, 'Htpc.py')]
     cmd += arguments[1:]
-    #os.chdir(os.getcwd())
-    #cherrypy.engine.exit()
-    #htpc.SCHED.shutdown(wait=False)
-    subprocess.Popen(arguments, cwd=os.getcwd())
+    subprocess.Popen(cmd, cwd=os.getcwd())
+    # Kill the app
     os._exit(0)
-    #os.execv(sys.executable, arguments)
 
 
 class RestrictedArea:
