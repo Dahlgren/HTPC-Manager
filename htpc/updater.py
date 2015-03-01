@@ -163,7 +163,7 @@ class Updater:
             return output
 
         # If HTPC Manager is up to date, updating is not needed
-        if current == latest:
+        if current == latest or current != "Unknown":
             self.logger.info("HTPC-Manager is Up-To-Date.")
             output['versionsBehind'] = 0
             htpc.COMMITS_BEHIND = 0
@@ -354,7 +354,6 @@ class SourceUpdater():
         self.versionFile = os.path.join(htpc.RUNDIR, 'VERSION.txt')
         self.updateFile = os.path.join(htpc.DATADIR, 'htpc-manager-update.tar.gz')
         self.updateDir = os.path.join(htpc.DATADIR, 'update-source')
-
 
     def current(self):
         """ Get hash of current runnig version """
