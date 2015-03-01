@@ -450,7 +450,7 @@ class SourceUpdater():
         self.logger.info("Attempting update from source.")
 
         self.UPDATING = 1
-        cherrypy.engine.exit()
+        #cherrypy.engine.exit()
 
         tarUrl = 'https://github.com/%s/%s/tarball/%s' % (gitUser, gitRepo, htpc.settings.get('branch', 'master2'))
 
