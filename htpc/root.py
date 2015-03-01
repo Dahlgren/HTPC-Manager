@@ -12,7 +12,6 @@ import htpc
 import logging
 from threading import Thread
 from cherrypy.lib.auth2 import *
-import subprocess
 
 
 def do_restart():
@@ -60,7 +59,7 @@ class Root(object):
         """ Shutdown CherryPy and exit script """
         self.logger.info("Shutting down htpc-manager.")
         cherrypy.engine.exit()
-        #htpc.SCHED.shutdown(wait=False)
+        os._exit(0)
         return "HTPC Manager has shut down"
 
     @cherrypy.expose(alias='robots.txt')
