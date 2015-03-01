@@ -202,9 +202,7 @@ class Updater:
         update_avail = self.check_update()
         self.logger.info(update_avail)
         # returns true or false
-        # force update every 2 minutes
-        if True is True:
-        #if update_avail.get("updateNeeded"):
+        if update_avail.get("updateNeeded"):
             if htpc.settings.get('app_check_for_updates', False):
                 self.logger.debug("Add update footer")
                 # Used for the notification footer
@@ -449,7 +447,6 @@ class SourceUpdater():
         self.logger.info("Attempting update from source.")
 
         self.UPDATING = 1
-        #cherrypy.engine.exit()
 
         tarUrl = 'https://github.com/%s/%s/tarball/%s' % (gitUser, gitRepo, htpc.settings.get('branch', 'master2'))
 

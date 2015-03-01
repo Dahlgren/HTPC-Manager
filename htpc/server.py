@@ -123,10 +123,10 @@ def start():
     # Create PID if specified
     if htpc.PID:
         PIDFile(cherrypy.engine, htpc.PID).subscribe()
-    
+
     def stopp_ap():
         htpc.SCHED.shutdown(wait=False)
-    
+
     stopp_ap.priority = 10
     cherrypy.engine.subscribe('stop', stopp_ap)
 
@@ -194,9 +194,4 @@ def start():
     print 'Starting HTPC Manager on port ' + str(htpc.PORT) + '.'
     print 'Start your browser and go to http%s://localhost:%s%s' % (protocol, htpc.PORT, htpc.WEBDIR[:-1])
     print '*******************************************************************'
-    print 'Silly test 1'
-    print 'Silly test 2'
-    print 't5'
-    print 't6'
-    print 't7'
     cherrypy.quickstart(htpc.ROOT, htpc.WEBDIR[:-1], config=app_config)

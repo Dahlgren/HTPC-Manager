@@ -15,28 +15,15 @@ from cherrypy.lib.auth2 import *
 import subprocess
 
 
-def do_restart2():
-    arguments = sys.argv[:]
-    cmd = [sys.executable, os.path.join(htpc.RUNDIR, 'Htpc.py')]
-    cmd += arguments[1:]
-    cherrypy.engine.exit()
-    htpc.SCHED.shutdown(wait=False)
-    subprocess.Popen(cmd, cwd=os.getcwd(), shell=True)
-    # Kill the app
-    os._exit(0)
-
 def do_restart():
-    print "do_restart"
-    # why do you randomly fail your fucker
     arguments = sys.argv[:]
     arguments.insert(0, sys.executable)
     if sys.platform == 'win32':
         arguments = ['"%s"' % arg for arg in arguments]
         print arguments
     os.chdir(os.getcwd())
-    #htpc.SCHED.shutdown(wait=False)
-    #cherrypy.engine.exit()
     os.execv(sys.executable, arguments)
+
 
 class RestrictedArea:
     # all methods in this controller (and subcontrollers) is
