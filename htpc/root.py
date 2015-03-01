@@ -31,7 +31,7 @@ def do_restart():
     if sys.platform == 'win32':
         arguments = ['"%s"' % arg for arg in arguments]
     os.chdir(os.getcwd())
-    htpc.SCHED.shutdown(wait=False)
+    #htpc.SCHED.shutdown(wait=False)
     cherrypy.engine.exit()
     os.execv(sys.executable, arguments)
 
