@@ -26,13 +26,16 @@ def do_restart2():
     os._exit(0)
 
 def do_restart():
+    print "do_restart"
+    # why do you randomly fail your fucker
     arguments = sys.argv[:]
     arguments.insert(0, sys.executable)
     if sys.platform == 'win32':
         arguments = ['"%s"' % arg for arg in arguments]
+        print arguments
     os.chdir(os.getcwd())
     #htpc.SCHED.shutdown(wait=False)
-    cherrypy.engine.exit()
+    #cherrypy.engine.exit()
     os.execv(sys.executable, arguments)
 
 class RestrictedArea:
